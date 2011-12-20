@@ -25,19 +25,50 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import simpleserver.Server;
+
 public abstract class DatabaseConnection {
+  protected final Server server;
+
   protected Connection connection = null;
   protected Statement statement = null;
 
+  public DatabaseConnection(Server server) {
+    this.server = server;
+  }
+
   abstract public void open() throws ClassNotFoundException, SQLException;
 
-  abstract public void close();
+  public void close() throws SQLException {
+    try {
+      if (statement != null) {
+        statement.close();
+      }
+
+      if (connection != null) {
+        connection.close();
+      }
+    } catch (SQLException e) {
+      throw e;
+    } finally {
+      statement = null;
+      connection = null;
+    }
+  }
 
   public synchronized boolean execute(String sql) throws SQLException {
+    if (statement == null) {
+      throw new SQLException("No open connection.");
+    }
+
     return statement.execute(sql);
   }
 
   public synchronized ResultSet executeQuery(String sql) throws SQLException {
+    if (statement == null) {
+      throw new SQLException("No open connection.");
+    }
+
     return statement.executeQuery(sql);
   }
 }

@@ -39,6 +39,12 @@
 	<property name="onlineMode">true</property>
 	<property name="custAuth">false</property>
 	<property name="myareaSize">64</property>
+	<property name="dbEnabled">false</property>
+	<property name="dbConnector">mysql</property>
+	<property name="dbHostname">localhost</property>
+	<property name="dbUsername">username</property>
+	<property name="dbPassword">password</property>
+	<property name="dbDatabase">smp</property>
 	
 	<ip group="5">127.0.0.1</ip>
 	

@@ -26,14 +26,17 @@ import java.sql.SQLException;
 import simpleserver.Server;
 
 public class MySQLConnection extends DatabaseConnection {
-  private final Server server;
 
   public MySQLConnection(Server server) {
-    this.server = server;
+    super(server);
   }
 
   @Override
   public void open() throws ClassNotFoundException, SQLException {
+    if (statement != null || connection != null) {
+      close();
+    }
+
     Class.forName("com.mysql.jdbc.Driver");
 
     String dbHost = server.config.properties.get("dbHost");
@@ -48,20 +51,5 @@ public class MySQLConnection extends DatabaseConnection {
     connection = DriverManager.getConnection(String.format("jdbc:mysql://%1$s/%2$s?user=%3$s&password=%4$s", dbHost, dbName, dbUsername, dbPassword));
 
     statement = connection.createStatement();
-  }
-
-  @Override
-  public void close() {
-    try {
-      if (statement != null) {
-        statement.close();
-      }
-
-      if (connection != null) {
-        connection.close();
-      }
-    } catch (SQLException e) {
-
-    }
   }
 }
