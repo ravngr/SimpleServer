@@ -30,19 +30,33 @@ import simpleserver.config.xml.AllBlocks;
 import simpleserver.config.xml.Area;
 import simpleserver.config.xml.Chests;
 import simpleserver.config.xml.Config;
+import simpleserver.config.xml.Config.AreaStoragePair;
 import simpleserver.config.xml.DimensionConfig;
 import simpleserver.config.xml.Permission;
-import simpleserver.config.xml.Config.AreaStoragePair;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
+  private static int DEFAULT_MAX_SIZE = 50;
+
   public MyAreaCommand() {
     super("myarea [start|end|save|unsave|rename]",
           "Manage your personal area");
   }
 
+  private int areaSize(Player player) {
+    int d = player.getServer().config.properties.getInt("myareaSize");
+
+    if (d <= 0) {
+      d = DEFAULT_MAX_SIZE;
+    }
+
+    return d;
+  }
+
   private boolean areaSizeOk(Player player) {
-    return (Math.abs(player.areastart.x() - player.areaend.x()) < 50)
-          && (Math.abs(player.areastart.z() - player.areaend.z()) < 50)
+    int max = areaSize(player);
+
+    return (Math.abs(player.areastart.x() - player.areaend.x()) < max)
+          && (Math.abs(player.areastart.z() - player.areaend.z()) < max)
           && player.areaend.dimension() == player.areastart.dimension();
   }
 
@@ -69,7 +83,9 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
         return;
       }
       if (!areaSizeOk(player)) {
-        player.addTMessage(Color.RED, "Your area is allowed to have a maximum size of 50x50!");
+        int max = areaSize(player);
+
+        player.addTMessage(Color.RED, "Your area is allowed to have a maximum size of " + max + "x" + max + "!");
         return;
       }
       if (player.getServer().config.playerArea(player) != null) {

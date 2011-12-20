@@ -38,6 +38,7 @@
 	<property name="xmlPCDATA">true</property>
 	<property name="onlineMode">true</property>
 	<property name="custAuth">false</property>
+	<property name="myareaSize">64</property>
 	
 	<ip group="5">127.0.0.1</ip>
 	
