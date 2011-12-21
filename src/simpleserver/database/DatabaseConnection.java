@@ -28,16 +28,29 @@ import java.sql.Statement;
 import simpleserver.Server;
 
 public abstract class DatabaseConnection {
+  private static final int DEFAULT_TIMEOUT = 10;
+
   protected final Server server;
 
   protected Connection connection = null;
   protected Statement statement = null;
 
-  public DatabaseConnection(Server server) {
+  private final String name;
+
+  public DatabaseConnection(String name, Server server) {
+    this.name = name;
     this.server = server;
   }
 
   abstract public void open() throws ClassNotFoundException, SQLException;
+
+  public boolean isValid(int timeout) throws SQLException {
+    return connection != null && connection.isValid(timeout) && statement != null && !statement.isClosed();
+  }
+
+  public boolean isValid() throws SQLException {
+    return isValid(DEFAULT_TIMEOUT);
+  }
 
   public void close() throws SQLException {
     try {
@@ -56,19 +69,23 @@ public abstract class DatabaseConnection {
     }
   }
 
-  public synchronized boolean execute(String sql) throws SQLException {
-    if (statement == null) {
+  public synchronized final boolean execute(String sql) throws SQLException {
+    if (connection == null || statement == null) {
       throw new SQLException("No open connection.");
     }
 
     return statement.execute(sql);
   }
 
-  public synchronized ResultSet executeQuery(String sql) throws SQLException {
-    if (statement == null) {
+  public synchronized final ResultSet executeQuery(String sql) throws SQLException {
+    if (connection == null || statement == null) {
       throw new SQLException("No open connection.");
     }
 
     return statement.executeQuery(sql);
+  }
+
+  public String getName() {
+    return name;
   }
 }

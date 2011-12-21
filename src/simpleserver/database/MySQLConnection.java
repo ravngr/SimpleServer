@@ -28,7 +28,7 @@ import simpleserver.Server;
 public class MySQLConnection extends DatabaseConnection {
 
   public MySQLConnection(Server server) {
-    super(server);
+    super("mysql", server);
   }
 
   @Override
@@ -39,17 +39,16 @@ public class MySQLConnection extends DatabaseConnection {
 
     Class.forName("com.mysql.jdbc.Driver");
 
-    String dbHost = server.config.properties.get("dbHost");
-    String dbName = server.config.properties.get("dbName");
-    String dbUsername = server.config.properties.get("dbUsername");
-    String dbPassword = server.config.properties.get("dbPassword");
+    String dbHost = server.config.properties.get("dbMySQLHostname");
+    String dbName = server.config.properties.get("dbMySQLDatabase");
+    String dbUsername = server.config.properties.get("dbMySQLUsername");
+    String dbPassword = server.config.properties.get("dbMySQLPassword");
 
     if (dbHost == null || dbName == null || dbUsername == null || dbPassword == null) {
       throw new SQLException("Missing database connection configuration");
     }
 
     connection = DriverManager.getConnection(String.format("jdbc:mysql://%1$s/%2$s?user=%3$s&password=%4$s", dbHost, dbName, dbUsername, dbPassword));
-
     statement = connection.createStatement();
   }
 }

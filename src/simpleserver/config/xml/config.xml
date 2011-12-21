@@ -41,10 +41,10 @@
 	<property name="myareaSize">64</property>
 	<property name="dbEnabled">false</property>
 	<property name="dbConnector">mysql</property>
-	<property name="dbHostname">localhost</property>
-	<property name="dbUsername">username</property>
-	<property name="dbPassword">password</property>
-	<property name="dbDatabase">smp</property>
+	<property name="dbMySQLHostname">localhost</property>
+	<property name="dbMySQLUsername">username</property>
+	<property name="dbMySQLPassword">password</property>
+	<property name="dbMySQLDatabase">smp</property>
 	
 	<ip group="5">127.0.0.1</ip>
 	
@@ -76,11 +76,12 @@
 	<command name="chat" allow="1+">
 		<alias>c</alias>
 	</command>
+	<command name="db" allow="5+" />
 	<command name="dimension" allow="0+">
 		<alias>d</alias>
 	</command>
 	<command name="enchant" alias="e" allow="4+" />
-	<command name="gamemode" allow="4+" />
+	<command name="gamemode" alias="gm" allow="4+" />
 	<command name="give" allow="3+" />
 	<command name="giveplayer" allow="4+" />
 	<command name="global" allow="0+" />

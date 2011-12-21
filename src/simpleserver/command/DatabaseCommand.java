@@ -25,80 +25,88 @@ import java.sql.SQLException;
 import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
-import simpleserver.database.DatabaseConnection;
+import simpleserver.database.DatabaseConnectionManager;
 
 public class DatabaseCommand extends AbstractCommand implements PlayerCommand,
     ServerCommand {
 
-  protected DatabaseCommand() {
+  public DatabaseCommand() {
     super("db [open|close]", "Manage database connection");
   }
 
   public void execute(Server server, String message, CommandFeedback feedback) {
-    DatabaseConnection connection = server.database;
+    DatabaseConnectionManager database = server.database;
 
     String arguments[] = extractArguments(message);
 
     if (arguments.length == 0) {
-      feedback.send("Usage: db [open|close]");
+      feedback.send("Usage: db [open|close|status]");
       return;
     }
 
-    if (arguments[0].equals("open")) {
-      try {
-        connection.open();
+    try {
+      if (arguments[0].equals("open")) {
+        database.open();
         feedback.send("Database connection opened.");
-      } catch (ClassNotFoundException e) {
-        server.errorLog(e, "Failed to open database connection, missing driver.");
-        feedback.send("Failed to open database connection!");
-      } catch (SQLException e) {
-        server.errorLog(e, "Failed to open database connection, server error.");
-        feedback.send("Failed to open database connection!");
+      } else if (arguments[0].equals("close")) {
+        database.close();
+        feedback.send("Database connection closed.");
+      } else if (arguments[0].equals("status")) {
+        if (!database.isEnabled()) {
+          feedback.send("Database disabled in configuration");
+        } else if (database.isValid()) {
+          feedback.send("Database connection open");
+        } else {
+          feedback.send("Database connection closed");
+        }
+      } else {
+        feedback.send("Invalid argument!");
       }
-    } else if (arguments[0].equals("close")) {
-      try {
-        connection.close();
-      } catch (SQLException e) {
-        server.errorLog(e, "Failed to close database connection, server error.");
-        feedback.send("Failed to close database connection!");
-      }
-    } else {
-      feedback.send("Invalid argument!");
+    } catch (ClassNotFoundException e) {
+      server.errorLog(e, "Failed to connect to database, missing driver.");
+      feedback.send(e.getMessage());
+    } catch (SQLException e) {
+      server.errorLog(e, "Database error, unknown server excption.");
+      feedback.send(e.getMessage());
     }
   }
 
   public void execute(Player player, String message) {
     Server server = player.getServer();
 
-    DatabaseConnection connection = server.database;
+    DatabaseConnectionManager database = server.database;
 
     String arguments[] = extractArguments(message);
 
     if (arguments.length == 0) {
-      player.addTCaptionedMessage("Usage", commandPrefix() + "db [open|close]");
+      player.addTCaptionedMessage("Usage", commandPrefix() + "db [open|close|status]");
       return;
     }
 
-    if (arguments[0].equals("open")) {
-      try {
-        connection.open();
-        player.addTMessage(Color.RED, "Database connection opened.");
-      } catch (ClassNotFoundException e) {
-        server.errorLog(e, "Failed to open database connection, missing driver.");
-        player.addTMessage(Color.RED, "Failed to open database connection!");
-      } catch (SQLException e) {
-        server.errorLog(e, "Failed to open database connection, server error.");
-        player.addTMessage(Color.RED, "Failed to open database connection!");
+    try {
+      if (arguments[0].equals("open")) {
+        database.open();
+        player.addTMessage("Database connection opened.");
+      } else if (arguments[0].equals("close")) {
+        database.close();
+        player.addTMessage("Database connection closed.");
+      } else if (arguments[0].equals("status")) {
+        if (!database.isEnabled()) {
+          player.addTMessage(Color.RED, "Database disabled");
+        } else if (database.isValid()) {
+          player.addTMessage(Color.GREEN, "Database connection open");
+        } else {
+          player.addTMessage(Color.RED, "Database connection closed");
+        }
+      } else {
+        player.addTMessage(Color.RED, "Invalid argument!");
       }
-    } else if (arguments[0].equals("close")) {
-      try {
-        connection.close();
-      } catch (SQLException e) {
-        server.errorLog(e, "Failed to close database connection, server error.");
-        player.addTMessage(Color.RED, "Failed to close database connection!");
-      }
-    } else {
-      player.addTMessage(Color.RED, "Invalid argument!");
+    } catch (ClassNotFoundException e) {
+      server.errorLog(e, "Failed to connect to database, missing driver.");
+      player.addTMessage(Color.RED, e.getMessage());
+    } catch (SQLException e) {
+      server.errorLog(e, "Database error, unknown server excption.");
+      player.addTMessage(Color.RED, e.getMessage());
     }
   }
 }
