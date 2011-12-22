@@ -30,37 +30,44 @@ import simpleserver.config.xml.AllBlocks;
 import simpleserver.config.xml.Area;
 import simpleserver.config.xml.Chests;
 import simpleserver.config.xml.Config;
-import simpleserver.config.xml.Config.AreaStoragePair;
 import simpleserver.config.xml.DimensionConfig;
 import simpleserver.config.xml.Permission;
+import simpleserver.config.xml.Config.AreaStoragePair;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
-  private static int DEFAULT_MAX_SIZE = 50;
-
+  private static final byte DEFAULT_SIZE = 50;
+  
   public MyAreaCommand() {
     super("myarea [start|end|save|unsave|rename]",
           "Manage your personal area");
   }
 
-  private int areaSize(Player player) {
-    int d = player.getServer().config.properties.getInt("myareaSize");
-
-    if (d <= 0) {
-      d = DEFAULT_MAX_SIZE;
-    }
-
-    return d;
-  }
-
-  private boolean areaSizeOk(Player player) {
-    int max = areaSize(player);
-
-    return (Math.abs(player.areastart.x() - player.areaend.x()) < max)
-          && (Math.abs(player.areastart.z() - player.areaend.z()) < max)
+  private boolean areaSizeOk(Player player, int[] size) {
+    return (Math.abs(player.areastart.x() - player.areaend.x()) < size[0])
+          && (Math.abs(player.areastart.z() - player.areaend.z()) < size[1])
           && player.areaend.dimension() == player.areastart.dimension();
+  }
+  
+  private int[] getAreaMax(Player player) {
+    // Get the maximum area sizes from config.xml
+    int[] size = { Math.abs(player.getServer().config.properties.getInt("areaMaxX")),
+                   Math.abs(player.getServer().config.properties.getInt("areaMaxZ")) };
+    
+    // Check to make sure the configuration is valid
+    // If not, reset to default size
+    for (byte i = 0; i < size.length; i++) {
+      if (size[i] <= 0 || Integer.valueOf(size[i]) == null) {
+        size[i] = DEFAULT_SIZE;
+      }
+    }
+    
+    return size;
   }
 
   public void execute(Player player, String message) {
+    // Set up an integer array to hold the maximum area size
+    int[] maxSize = getAreaMax(player); // X, Z
+    
     Config config = player.getServer().config;
     String arguments[] = extractArguments(message);
 
@@ -68,7 +75,7 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
       player.addTCaptionedMessage("Usage", commandPrefix() + "myarea [start|end|save|unsave|rename]");
       return;
     }
-
+    
     if (arguments[0].equals("start")) {
       player.areastart = player.position();
       player.areastart = player.areastart.setY((byte) 0); // no height limit
@@ -82,10 +89,9 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
         player.addTMessage(Color.RED, "Define start and end coordinates for your area first!");
         return;
       }
-      if (!areaSizeOk(player)) {
-        int max = areaSize(player);
-
-        player.addTMessage(Color.RED, "Your area is allowed to have a maximum size of " + max + "x" + max + "!");
+      if (!areaSizeOk(player, maxSize)) {
+        player.addTMessage(Color.RED, "Your area is allowed to have a maximum size of " +
+                                      maxSize[0] + "x" + maxSize[1] + "!");
         return;
       }
       if (player.getServer().config.playerArea(player) != null) {
