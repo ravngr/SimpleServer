@@ -29,7 +29,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.SecureRandom;
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -132,7 +131,7 @@ public class Server {
   public BotController bots;
   public WorldFile world;
 
-  public DatabaseConnectionManager database;
+  public DatabaseConnectionManager databaseManager;
 
   public Server() {
     listener = new Listener();
@@ -415,7 +414,7 @@ public class Server {
     connectionLog = new ConnectionLog();
 
     commandParser = new CommandParser(options);
-    database = new DatabaseConnectionManager(this);
+    databaseManager = new DatabaseConnectionManager(this);
   }
 
   private void cleanup() {
@@ -470,18 +469,6 @@ public class Server {
       rconServer = new RconServer(this);
     }
 
-    if (database.isEnabled()) {
-      try {
-        database.open();
-      } catch (ClassNotFoundException e) {
-        System.out.println("[SimpleServer] Failed to load database driver. See error log for details.");
-        errorLog.addMessage(e, "Failed to load database driver");
-      } catch (SQLException e) {
-        System.out.println("[SimpleServer] Unspecified datbase server error. See error log for details.");
-        errorLog.addMessage(e, "Unspecified database server error");
-      }
-    }
-
     world = new WorldFile(options.get("levelName"));
     autoSpaceCheck = new AutoFreeSpaceChecker(this);
     autoBackup = new AutoBackup(this);
@@ -511,12 +498,6 @@ public class Server {
           e.printStackTrace();
         }
       }
-    }
-
-    try {
-      database.close();
-    } catch (SQLException e) {
-      e.printStackTrace();
     }
 
     kickAllPlayers();
