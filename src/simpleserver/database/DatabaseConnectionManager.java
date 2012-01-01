@@ -21,6 +21,7 @@
 package simpleserver.database;
 
 import java.lang.reflect.Modifier;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,13 +35,15 @@ import simpleserver.Server;
 public class DatabaseConnectionManager {
   private final Server server;
 
-  private final Map<String, DatabaseConnection> connectors;
-
-  public DatabaseConnection connection;
+  private Map<String, DatabaseConnection> connectors;
 
   public DatabaseConnectionManager(Server server) {
     this.server = server;
 
+    reloadConnectors(server);
+  }
+
+  public void reloadConnectors(Server server) {
     connectors = new HashMap<String, DatabaseConnection>();
 
     Reflections r = new Reflections("simpleserver", new SubTypesScanner());
@@ -66,62 +69,19 @@ public class DatabaseConnectionManager {
     }
   }
 
-  public void open() throws ClassNotFoundException, SQLException {
-    if (!server.config.properties.getBoolean("dbEnabled")) {
-      // Force closure when disabled
-      try {
-        close();
-      } catch (SQLException e) {
+  public Connection getConnector() throws ClassNotFoundException, DatabaseConfigurationException, SQLException {
+    String connector = server.config.properties.get("dbConnector");
 
-      }
-
-      throw new SQLException("Database disabled in configuration");
+    if (connector == null) {
+      throw new DatabaseConfigurationException("Missing dbConnector from configuration");
     }
 
-    boolean connect = false;
+    DatabaseConnection c = connectors.get(connector);
 
-    try {
-      if (connection == null) {
-        connect = true;
-      } else if (!connection.isValid(30)) {
-        connect = true;
-        connection.close();
-      }
-    } catch (SQLException e) {
-      // Connection error on checking validity
-      connect = true;
-      connection.close();
+    if (c == null) {
+      throw new DatabaseConfigurationException("Specified database connector " + connector + " was not found");
     }
 
-    if (connect) {
-      connection = connectors.get(server.config.properties.get("dbConnector"));
-
-      if (connection == null) {
-        throw new SQLException("Invalid or missing database connector");
-      }
-    }
-
-    connection.open();
-  }
-
-  public void close() throws SQLException {
-    if (connection == null) {
-      return;
-    }
-
-    connection.close();
-    connection = null;
-  }
-
-  public boolean isEnabled() {
-    return server.config.properties.getBoolean("dbEnabled");
-  }
-
-  public boolean isValid() throws SQLException {
-    if (connection == null) {
-      return false;
-    }
-
-    return connection.isValid();
+    return c.newConnection(server);
   }
 }

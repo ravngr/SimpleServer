@@ -20,21 +20,10 @@
  */
 package simpleserver.database;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+public class DatabaseConfigurationException extends Exception {
+  private static final long serialVersionUID = 2549901672206428915L;
 
-import simpleserver.Server;
-
-public abstract class DatabaseConnection {
-  private final String name;
-
-  public DatabaseConnection(String name) {
-    this.name = name;
+  public DatabaseConfigurationException(String message) {
+    super(message);
   }
-
-  public String getName() {
-    return name;
-  }
-
-  abstract public Connection newConnection(Server server) throws ClassNotFoundException, DatabaseConfigurationException, SQLException;
 }

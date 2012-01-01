@@ -20,23 +20,19 @@
  */
 package simpleserver.database;
 
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import simpleserver.Server;
 
 public class MySQLConnection extends DatabaseConnection {
-
   public MySQLConnection(Server server) {
-    super("mysql", server);
+    super("mysql");
   }
 
   @Override
-  public void open() throws ClassNotFoundException, SQLException {
-    if (statement != null || connection != null) {
-      close();
-    }
-
+  public Connection newConnection(Server server) throws DatabaseConfigurationException, ClassNotFoundException, SQLException {
     Class.forName("com.mysql.jdbc.Driver");
 
     String dbHost = server.config.properties.get("dbMySQLHostname");
@@ -44,11 +40,20 @@ public class MySQLConnection extends DatabaseConnection {
     String dbUsername = server.config.properties.get("dbMySQLUsername");
     String dbPassword = server.config.properties.get("dbMySQLPassword");
 
-    if (dbHost == null || dbName == null || dbUsername == null || dbPassword == null) {
-      throw new SQLException("Missing database connection configuration");
+    if (dbHost == null) {
+      throw new DatabaseConfigurationException("Missing MySQL hostname");
     }
 
-    connection = DriverManager.getConnection(String.format("jdbc:mysql://%1$s/%2$s?user=%3$s&password=%4$s", dbHost, dbName, dbUsername, dbPassword));
-    statement = connection.createStatement();
+    if (dbName == null) {
+      throw new DatabaseConfigurationException("Missing MySQL database name");
+    }
+
+    if (dbUsername == null && dbPassword == null) {
+      return DriverManager.getConnection(String.format("jdbc:mysql://%1$s/%2$s", dbHost, dbName));
+    } else if (dbPassword == null) {
+      return DriverManager.getConnection(String.format("jdbc:mysql://%1$s/%2$s?user=%3$s", dbHost, dbName, dbUsername));
+    } else {
+      return DriverManager.getConnection(String.format("jdbc:mysql://%1$s/%2$s?user=%3$s&password=%4$s", dbHost, dbName, dbUsername, dbPassword));
+    }
   }
 }
