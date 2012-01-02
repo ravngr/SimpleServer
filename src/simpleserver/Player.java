@@ -852,6 +852,14 @@ public class Player {
     }
   }
 
+  public boolean isHidden() {
+    return hidden;
+  }
+
+  public void setHidden(boolean hidden) {
+    this.hidden = hidden;
+  }
+
   private final class Warmup extends TimerTask {
     private final Position position;
 
