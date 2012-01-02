@@ -31,7 +31,7 @@ import simpleserver.database.DatabaseConfigurationException;
 
 public class PlayerTracker {
   private static final String CLEAR_QUERY = "TRUNCATE player_tracker";
-  private static final String INSERT_QUERY = "INSERT INTO player_tracker VALUES (?, ?, ?, ?, ?, ?)";
+  private static final String INSERT_QUERY = "INSERT INTO player_tracker VALUES (?, ?, ?, ?, ?, ?, ?)";
 
   private final Server server;
   private final Tracker tracker;
@@ -99,6 +99,7 @@ public class PlayerTracker {
               statementInsert.setInt(4, player.position().x());
               statementInsert.setInt(5, y);
               statementInsert.setInt(6, player.position().z());
+              statementInsert.setBoolean(7, player.isHidden());
 
               statementInsert.executeUpdate();
             }
