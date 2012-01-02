@@ -46,6 +46,8 @@
 	<property name="dbMySQLDatabase">smp</property>
 	<property name="playerTrackerSecs">30</property>
     <property name="playerTracker">false</property>
+    <property name="c10tArgs"></property>
+    <property name="c10tMins">60</property>
 	
 	<ip group="5">127.0.0.1</ip>
 	

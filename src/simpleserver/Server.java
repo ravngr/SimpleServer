@@ -478,7 +478,7 @@ public class Server {
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
     playerTracker = new PlayerTracker(this);
-    c10t = new AutoRun(this, options.get("c10tArgs"));
+    c10t = new AutoRun(this, config.properties.get("c10tArgs"));
     if (data.freezeTime() >= 0) {
       time.freeze(data.freezeTime());
     }

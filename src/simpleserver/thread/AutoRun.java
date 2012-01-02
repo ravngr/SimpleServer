@@ -55,8 +55,8 @@ public class AutoRun {
 
   private boolean needsRun() {
     long maxAge = System.currentTimeMillis() - MILLISECONDS_PER_MINUTE
-        * server.options.getInt("c10tMins");
-    return server.options.contains("c10tArgs") && maxAge > lastRun
+        * server.config.properties.getInt("c10tMins");
+    return server.config.properties.contains("c10tArgs") && maxAge > lastRun
         && server.numPlayers() > 0;
   }
 
