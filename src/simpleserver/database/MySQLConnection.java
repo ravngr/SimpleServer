@@ -41,7 +41,7 @@ public class MySQLConnection extends DatabaseConnection {
     String dbPassword = server.config.properties.get("dbMySQLPassword");
 
     if (dbHost == null) {
-      throw new DatabaseConfigurationException("Missing MySQL hostname");
+      dbHost = "localhost";
     }
 
     if (dbName == null) {

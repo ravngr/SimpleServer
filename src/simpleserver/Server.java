@@ -66,6 +66,7 @@ import simpleserver.thread.AutoFreeSpaceChecker;
 import simpleserver.thread.AutoRestart;
 import simpleserver.thread.AutoRun;
 import simpleserver.thread.AutoSave;
+import simpleserver.thread.PlayerTracker;
 import simpleserver.thread.RequestTracker;
 import simpleserver.thread.SystemInputQueue;
 
@@ -118,6 +119,7 @@ public class Server {
   private AutoSave autosave;
   private AutoRestart autoRestart;
   public RequestTracker requestTracker;
+  private PlayerTracker playerTracker;
 
   public long mapSeed;
 
@@ -414,6 +416,7 @@ public class Server {
     connectionLog = new ConnectionLog();
 
     commandParser = new CommandParser(options);
+
     databaseManager = new DatabaseConnectionManager(this);
   }
 
@@ -474,6 +477,7 @@ public class Server {
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
+    playerTracker = new PlayerTracker(this);
     c10t = new AutoRun(this, options.get("c10tArgs"));
     if (data.freezeTime() >= 0) {
       time.freeze(data.freezeTime());
@@ -513,6 +517,7 @@ public class Server {
     autosave.stop();
     autoRestart.stop();
     requestTracker.stop();
+    playerTracker.stop();
     c10t.stop();
     saveResources();
 
