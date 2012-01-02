@@ -47,6 +47,7 @@ import simpleserver.config.WhiteList;
 import simpleserver.config.data.GlobalData;
 import simpleserver.config.xml.Config;
 import simpleserver.config.xml.GlobalConfig;
+import simpleserver.database.DatabaseConnectionManager;
 import simpleserver.export.CustAuthExport;
 import simpleserver.lang.Translations;
 import simpleserver.log.AdminLog;
@@ -65,6 +66,7 @@ import simpleserver.thread.AutoFreeSpaceChecker;
 import simpleserver.thread.AutoRestart;
 import simpleserver.thread.AutoRun;
 import simpleserver.thread.AutoSave;
+import simpleserver.thread.PlayerTracker;
 import simpleserver.thread.RequestTracker;
 import simpleserver.thread.SystemInputQueue;
 
@@ -117,6 +119,7 @@ public class Server {
   private AutoSave autosave;
   private AutoRestart autoRestart;
   public RequestTracker requestTracker;
+  private PlayerTracker playerTracker;
 
   public long mapSeed;
 
@@ -129,6 +132,8 @@ public class Server {
   public Time time;
   public BotController bots;
   public WorldFile world;
+
+  public DatabaseConnectionManager databaseManager;
 
   public Server() {
     listener = new Listener();
@@ -411,6 +416,8 @@ public class Server {
     connectionLog = new ConnectionLog();
 
     commandParser = new CommandParser(options);
+
+    databaseManager = new DatabaseConnectionManager(this);
   }
 
   private void cleanup() {
@@ -464,11 +471,13 @@ public class Server {
     if (options.getBoolean("enableRcon")) {
       rconServer = new RconServer(this);
     }
+
     world = new WorldFile(options.get("levelName"));
     autoSpaceCheck = new AutoFreeSpaceChecker(this);
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
+    playerTracker = new PlayerTracker(this);
     c10t = new AutoRun(this, options.get("c10tArgs"));
     if (data.freezeTime() >= 0) {
       time.freeze(data.freezeTime());
@@ -508,6 +517,7 @@ public class Server {
     autosave.stop();
     autoRestart.stop();
     requestTracker.stop();
+    playerTracker.stop();
     c10t.stop();
     saveResources();
 

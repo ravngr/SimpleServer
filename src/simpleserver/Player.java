@@ -102,6 +102,8 @@ public class Player {
   private long lastTeleport;
   private short experienceLevel;
 
+  private boolean hidden = false;
+
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
     position = new Position();

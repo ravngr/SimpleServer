@@ -39,6 +39,13 @@
 	<property name="onlineMode">true</property>
 	<property name="custAuth">false</property>
 	<property name="myareaSize">64</property>
+	<property name="dbConnector">mysql</property>
+	<property name="dbMySQLHostname">localhost</property>
+	<property name="dbMySQLUsername">username</property>
+	<property name="dbMySQLPassword">password</property>
+	<property name="dbMySQLDatabase">smp</property>
+	<property name="playerTrackerSecs">30</property>
+    <property name="playerTracker">false</property>
 	
 	<ip group="5">127.0.0.1</ip>
 	
@@ -70,11 +77,12 @@
 	<command name="chat" allow="1+">
 		<alias>c</alias>
 	</command>
+	<command name="db" allow="5+" />
 	<command name="dimension" allow="0+">
 		<alias>d</alias>
 	</command>
 	<command name="enchant" alias="e" allow="4+" />
-	<command name="gamemode" allow="4+" />
+	<command name="gamemode" alias="gm" allow="4+" />
 	<command name="give" allow="3+" />
 	<command name="giveplayer" allow="4+" />
 	<command name="global" allow="0+" />
