@@ -111,6 +111,9 @@
 	<command name="motd" allow="0+" />
 	<command name="mute" allow="3+" />
 	<command name="myarea" allow="2+" />
+	<command name="myareaadmin" allow="2+">
+	   <alias>myadmin</alias>
+   </command>
 	<command name="mystats" allow="1+" />
 	<command name="register" allow="1+">
 		<alias>passwd</alias>
