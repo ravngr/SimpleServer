@@ -146,6 +146,7 @@
 		<argument allow="4+">*</argument>
 	</command>
 	<command name="toggledownfall" alias="rain" allow="4+" />
+	<command name="track" allow="2+">
 	<command name="unban" allow="4+" />
 	<command name="unbanip" allow="4+" />
 	<command name="unlock" allow="1+" />
