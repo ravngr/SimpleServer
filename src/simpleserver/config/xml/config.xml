@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE config SYSTEM "http://simpleserver.ceilingcat.ch/resources/config.1.dtd">
 <config>
-    <property name="announceRestart">true</property>
+	<property name="announceRestart">true</property>
 	<property name="logMessages">true</property>
 	<property name="autoSaveMins">5</property>
 	<property name="keepBackupHours">24</property>
@@ -45,9 +45,9 @@
 	<property name="dbMySQLPassword">password</property>
 	<property name="dbMySQLDatabase">smp</property>
 	<property name="playerTrackerSecs">30</property>
-    <property name="playerTracker">false</property>
-    <property name="c10tArgs"></property>
-    <property name="c10tMins">60</property>
+	<property name="playerTracker">false</property>
+	<property name="c10tArgs"></property>
+	<property name="c10tMins">60</property>
 	
 	<ip group="5">127.0.0.1</ip>
 	
@@ -69,6 +69,7 @@
 	</group>
 	
 	<command name="area" allow="0+" />
+	<command name="areaowner" allow="4+" />
 	<command name="areasay" allow="0+">
 		<alias>a</alias>
 	</command>
@@ -112,8 +113,8 @@
 	<command name="mute" allow="3+" />
 	<command name="myarea" allow="2+" />
 	<command name="myareaadmin" allow="2+">
-	   <alias>myadmin</alias>
-   </command>
+		<alias>myadmin</alias>
+	</command>
 	<command name="mystats" allow="1+" />
 	<command name="register" allow="1+">
 		<alias>passwd</alias>
@@ -146,7 +147,7 @@
 		<argument allow="4+">*</argument>
 	</command>
 	<command name="toggledownfall" alias="rain" allow="4+" />
-	<command name="track" allow="2+">
+	<command name="track" allow="2+" />
 	<command name="unban" allow="4+" />
 	<command name="unbanip" allow="4+" />
 	<command name="unlock" allow="1+" />
