@@ -116,6 +116,7 @@
 		<alias>myadmin</alias>
 	</command>
 	<command name="mystats" allow="1+" />
+	<command name="pos" allow="4+" />
 	<command name="register" allow="1+">
 		<alias>passwd</alias>
 	</command>
