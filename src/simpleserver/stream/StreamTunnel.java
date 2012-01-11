@@ -1037,7 +1037,7 @@ public class StreamTunnel {
     double y = in.readDouble();
     double stance = in.readDouble();
     double z = in.readDouble();
-    player.position.updatePosition(x, y, z, stance);
+    player.updatePosition(x, y, z, stance);
     write(x);
     write(y);
     write(stance);

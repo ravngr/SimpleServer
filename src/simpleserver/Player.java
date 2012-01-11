@@ -25,6 +25,7 @@ import static simpleserver.lang.Translations.t;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.List;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -40,6 +41,7 @@ import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.KitList.Kit;
 import simpleserver.config.data.Stats.StatField;
+import simpleserver.config.xml.Area;
 import simpleserver.config.xml.CommandConfig;
 import simpleserver.config.xml.CommandConfig.Forwarding;
 import simpleserver.config.xml.Group;
@@ -83,6 +85,9 @@ public class Player {
   private int blocksDestroyed = 0;
   private Player reply = null;
   private String lastCommand = "";
+
+  private Area deepestArea = null;
+  private boolean announceArea = true;
 
   private AbstractChat chatType;
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
@@ -858,6 +863,52 @@ public class Player {
 
   public void setHidden(boolean hidden) {
     this.hidden = hidden;
+  }
+
+  public boolean isAnnounceArea() {
+    return announceArea;
+  }
+
+  public void setAnnounceArea(boolean announceArea) {
+    this.announceArea = announceArea;
+  }
+
+  public void updatePosition(double x, double y, double z, double stance) {
+    if (announceArea && ((int) x != (int) position.x() || (int) z != (int) position.z())) {
+      position.updatePosition(x, y, z, stance);
+
+      List<Area> areas = server.config.dimensions.areas(position());
+
+      if (areas == null || areas.isEmpty()) {
+        if (deepestArea != null) {
+          addTMessage(Color.GRAY, "You are currently in no areas");
+          deepestArea = null;
+        }
+
+        return;
+      }
+
+      if (deepestArea != null && deepestArea.equals(areas.get(areas.size() - 1))) {
+        return;
+      }
+
+      StringBuilder str = new StringBuilder();
+
+      for (Area area : areas) {
+        str.append(area.name);
+        str.append(", ");
+      }
+
+      if (!areas.isEmpty()) {
+        str.delete(str.length() - 2, str.length() - 1);
+      }
+
+      addTCaptionedMessage("Current areas", str.toString());
+
+      deepestArea = areas.get(areas.size() - 1);
+    } else {
+      position.updatePosition(x, y, z, stance);
+    }
   }
 
   private final class Warmup extends TimerTask {
