@@ -28,24 +28,40 @@ import simpleserver.config.xml.Area;
 
 public class AreaCommand extends AbstractCommand implements PlayerCommand {
   public AreaCommand() {
-    super("area", "Show the name of current area");
+    super("area [on|off]", "Show the name of current area or toggle auto-announcments");
   }
 
   public void execute(Player player, String message) {
-    List<Area> areas = player.getServer().config.dimensions.areas(player.position());
-    StringBuilder str = new StringBuilder();
-    if (areas == null || areas.isEmpty()) {
-      player.addTMessage(Color.GRAY, "You are currently in no areas");
-      return;
-    }
-    for (Area area : areas) {
-      str.append(area.name);
-      str.append(", ");
-    }
-    if (!areas.isEmpty()) {
-      str.delete(str.length() - 2, str.length() - 1);
-    }
+    String arguments[] = extractArguments(message);
 
-    player.addTCaptionedMessage("Current areas", str.toString());
+    if (arguments.length == 0) {
+      List<Area> areas = player.getServer().config.dimensions.areas(player.position());
+      StringBuilder str = new StringBuilder();
+      if (areas == null || areas.isEmpty()) {
+        player.addTMessage(Color.GRAY, "You are currently in no areas");
+        return;
+      }
+      for (Area area : areas) {
+        str.append(area.name);
+        str.append(", ");
+      }
+      if (!areas.isEmpty()) {
+        str.delete(str.length() - 2, str.length() - 1);
+      }
+
+      player.addTCaptionedMessage("Current areas", str.toString());
+    } else if (arguments.length == 1) {
+      if (arguments[0].equals("on")) {
+        player.setAnnounceArea(true);
+        player.addTMessage(Color.GRAY, "Area announcements enabled.");
+      } else if (arguments[0].equals("off")) {
+        player.setAnnounceArea(false);
+        player.addTMessage(Color.GRAY, "Area announcements disabled.");
+      } else {
+        player.addTMessage(Color.RED, "You entered an invalid argument.");
+      }
+    } else {
+      player.addTCaptionedMessage("Usage", commandPrefix() + "area [on|off]");
+    }
   }
 }

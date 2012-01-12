@@ -32,6 +32,7 @@ public class PlayerData implements Iterable<String> {
   private NBTCompound node;
   public Stats stats = new Stats(this);
   public Homes homes = new Homes(this);
+  public Options options = new Options(this);
 
   private final static String PLAYERS = "players";
 

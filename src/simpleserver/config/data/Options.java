@@ -18,32 +18,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.config.data;
 
-import simpleserver.Color;
-import simpleserver.Player;
+import simpleserver.nbt.NBTByte;
+import simpleserver.nbt.NBTCompound;
 
-public class TrackCommand extends AbstractCommand implements PlayerCommand {
-  public TrackCommand() {
-    super("track [on|off]", "Show or hide yourself on tracking");
+public class Options {
+  private final PlayerData playerData;
+
+  Options(PlayerData playerData) {
+    this.playerData = playerData;
   }
 
-  public void execute(Player player, String message) {
-    String arguments[] = extractArguments(message);
+  public boolean get(String playerName, OptionField option, boolean initial) {
+    NBTCompound player = playerData.get(playerName);
 
-    if (arguments.length == 0) {
-      player.addTCaptionedMessage("Usage", commandPrefix() + "track [on|off]");
-      return;
+    if (player.containsKey(option.toString())) {
+      return (player.getByte(option.toString()).get() > 0);
     }
 
-    if (arguments[0].equals("on")) {
-      player.setHidden(false);
-      player.addTMessage(Color.GRAY, "You are now visible.");
-    } else if (arguments[0].equals("off")) {
-      player.setHidden(true);
-      player.addTMessage(Color.GRAY, "You are now hidden.");
-    } else {
-      player.addTMessage(Color.RED, "You entered an invalid argument.");
-    }
+    return initial;
+  }
+
+  public void set(String playerName, OptionField option, boolean value) {
+    NBTCompound player = playerData.get(playerName);
+
+    NBTByte tag = new NBTByte((byte) (value ? 1 : 0));
+    tag.rename(option.toString());
+
+    player.put(tag);
+  }
+
+  public enum OptionField {
+    OPT_HIDDEN,
+    OPT_AREA_ANNOUNCE;
   }
 }

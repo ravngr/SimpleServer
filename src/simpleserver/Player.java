@@ -40,6 +40,7 @@ import simpleserver.bot.Teleporter;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.KitList.Kit;
+import simpleserver.config.data.Options.OptionField;
 import simpleserver.config.data.Stats.StatField;
 import simpleserver.config.xml.Area;
 import simpleserver.config.xml.CommandConfig;
@@ -86,9 +87,6 @@ public class Player {
   private Player reply = null;
   private String lastCommand = "";
 
-  private Area deepestArea = null;
-  private boolean announceArea = true;
-
   private AbstractChat chatType;
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
   private Queue<String> forwardMessages = new ConcurrentLinkedQueue<String>();
@@ -107,7 +105,7 @@ public class Player {
   private long lastTeleport;
   private short experienceLevel;
 
-  private boolean hidden = false;
+  private Area deepestArea = null;
 
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
@@ -858,23 +856,19 @@ public class Player {
   }
 
   public boolean isHidden() {
-    return hidden;
+    return server.data.players.options.get(name, OptionField.OPT_HIDDEN, false);
   }
 
   public void setHidden(boolean hidden) {
-    this.hidden = hidden;
-  }
-
-  public boolean isAnnounceArea() {
-    return announceArea;
+    server.data.players.options.set(name, OptionField.OPT_HIDDEN, hidden);
   }
 
   public void setAnnounceArea(boolean announceArea) {
-    this.announceArea = announceArea;
+    server.data.players.options.set(name, OptionField.OPT_AREA_ANNOUNCE, announceArea);
   }
 
   public void updatePosition(double x, double y, double z, double stance) {
-    if (announceArea && ((int) x != (int) position.x() || (int) z != (int) position.z())) {
+    if (server.data.players.options.get(name, OptionField.OPT_AREA_ANNOUNCE, true) && ((int) x != (int) position.x() || (int) z != (int) position.z())) {
       position.updatePosition(x, y, z, stance);
 
       List<Area> areas = server.config.dimensions.areas(position());
