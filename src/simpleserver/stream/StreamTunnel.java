@@ -186,11 +186,13 @@ public class StreamTunnel {
           player.setEntityId(write(in.readInt()));
           write(readUTF16());
           server.setMapSeed(write(in.readLong()));
+          write(readUTF16());
         } else {
           write(in.readInt());
           readUTF16(); // and throw away
           write(player.getName());
           write(in.readLong());
+          write(readUTF16());
         }
 
         write(in.readInt());
@@ -364,6 +366,7 @@ public class StreamTunnel {
         write(in.readByte());
         write(in.readShort());
         write(in.readLong());
+        write(readUTF16());
         break;
       case 0x0a: // Player
         write(packetId);
