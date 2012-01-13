@@ -22,10 +22,10 @@
 	<property name="serverLanguage">en</property>
 	<property name="logMessageFormat">%1$s-&gt;%2$s\: %3$s</property>
 	<property name="autoRestartMins">240</property>
-	<property name="msgTitleFormat">§%3$s&lt;[%2$s]%1$s&gt;§f</property>
+	<property name="msgTitleFormat">§%3$s&lt;[%2$s] %1$s&gt; §f</property>
 	<property name="meCommandFormat"> * %1$s%3$s%2$s</property>
 	<property name="exitOnFailure">true</property>
-	<property name="msgFormat">§%3$s&lt;%1$s&gt;§f</property>
+	<property name="msgFormat">§%3$s&lt;%1$s&gt; §f</property>
 	<property name="forwardAllCommands">false</property>
 	<property name="forwardChat">false</property>
 	<property name="chatToConsole">true</property>
@@ -44,10 +44,12 @@
 	<property name="dbMySQLUsername">username</property>
 	<property name="dbMySQLPassword">password</property>
 	<property name="dbMySQLDatabase">smp</property>
-	<property name="playerTrackerSecs">30</property>
 	<property name="playerTracker">false</property>
-	<property name="c10tArgs"></property>
-	<property name="c10tMins">60</property>
+	<property name="playerTrackerSecs">30</property>
+	<property name="mapper">false</property>
+	<property name="mapperCmd">c10t</property>
+	<property name="mapperMins">60</property>
+	<property name="announceMapper">true</property>
 	
 	<ip group="5">127.0.0.1</ip>
 	

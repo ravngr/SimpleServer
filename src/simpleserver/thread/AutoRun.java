@@ -31,15 +31,23 @@ public class AutoRun {
   private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
 
   private final Server server;
-  private final String command;
+  private final String title;
+  private final String propertyEnable;
+  private final String propertyAnnounce;
+  private final String propertyCommand;
+  private final String propertyInterval;
   private final Runner runner;
 
   private long lastRun;
   private volatile boolean run = true;
 
-  public AutoRun(Server server, String command) {
+  public AutoRun(Server server, String title, String propertyEnable, String propertyAnnounce, String propertyCommand, String propertyInterval) {
     this.server = server;
-    this.command = command;
+    this.title = title;
+    this.propertyEnable = propertyEnable;
+    this.propertyAnnounce = propertyAnnounce;
+    this.propertyCommand = propertyCommand;
+    this.propertyInterval = propertyInterval;
 
     lastRun = System.currentTimeMillis();
 
@@ -55,8 +63,8 @@ public class AutoRun {
 
   private boolean needsRun() {
     long maxAge = System.currentTimeMillis() - MILLISECONDS_PER_MINUTE
-        * server.config.properties.getInt("c10tMins");
-    return server.config.properties.get("c10tArgs").length() > 0 && maxAge > lastRun;
+        * server.config.properties.getInt(propertyInterval);
+    return server.config.properties.getBoolean(propertyEnable) && maxAge > lastRun;
   }
 
   private static final class OutputConsumer extends Thread {
@@ -77,6 +85,12 @@ public class AutoRun {
     }
   }
 
+  public void announce(String message) {
+    if (server.config.properties.getBoolean(propertyAnnounce)) {
+      server.runCommand("say", message);
+    }
+  }
+
   private final class Runner extends Thread {
     @Override
     public void run() {
@@ -87,16 +101,27 @@ public class AutoRun {
           } catch (InterruptedException e) {
             continue;
           }
-          server.runCommand("say", t("Mapping Server!"));
+
+          announce(t(title + " started!"));
+
+          server.runCommand("save-all", null);
+
+          while (server.isSaving()) {
+            try {
+              Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+          }
+
           server.runCommand("save-off", null);
 
           lastRun = System.currentTimeMillis();
           try {
             Process process;
             try {
-              process = Runtime.getRuntime().exec(command);
+              process = Runtime.getRuntime().exec(server.config.properties.get(propertyCommand));
             } catch (IOException e) {
-              server.runCommand("say", t("Mapping Failed!"));
+              announce(t(title + " failed!"));
               System.out.println("[SimpleServer] " + e);
               System.out.println("[SimpleServer] Cron Failed! Bad Command!");
               server.errorLog(e, "AutoRun Failure");
@@ -119,11 +144,11 @@ public class AutoRun {
             }
 
             if (exitCode < 0) {
-              System.out.println("[SimpleServer] c10t Failed! Exited with code "
+              System.out.println("[SimpleServer] " + title + " Failed! Exited with code "
                   + exitCode + "!");
-              server.runCommand("say", t("Mapping Failed!"));
+              announce(t(title + " failed!"));
             } else {
-              server.runCommand("say", t("Mapping Complete!"));
+              announce(t(title + " complete!"));
             }
           } finally {
             server.runCommand("save-on", null);
