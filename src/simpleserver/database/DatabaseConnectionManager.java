@@ -40,10 +40,10 @@ public class DatabaseConnectionManager {
   public DatabaseConnectionManager(Server server) {
     this.server = server;
 
-    reloadConnectors(server);
+    reloadConnectors();
   }
 
-  public void reloadConnectors(Server server) {
+  public void reloadConnectors() {
     connectors = new HashMap<String, DatabaseConnection>();
 
     Reflections r = new Reflections("simpleserver", new SubTypesScanner());
