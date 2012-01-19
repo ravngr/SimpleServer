@@ -28,7 +28,7 @@ import simpleserver.Server;
 public abstract class DatabaseConnection {
   private final String name;
 
-  public DatabaseConnection(String name) {
+  protected DatabaseConnection(String name) {
     this.name = name;
   }
 
