@@ -46,10 +46,10 @@
 	<property name="dbMySQLDatabase">smp</property>
 	<property name="playerTracker">false</property>
 	<property name="playerTrackerSecs">30</property>
-	<property name="mapper">false</property>
-	<property name="mapperCmd">c10t</property>
-	<property name="mapperMins">60</property>
-	<property name="announceMapper">true</property>
+	<property name="autoMap">false</property>
+	<property name="autoMapCmd">c10t</property>
+	<property name="autoMapMins">60</property>
+	<property name="announceMap">true</property>
 	
 	<ip group="5">127.0.0.1</ip>
 	
@@ -82,7 +82,6 @@
 	<command name="chat" allow="1+">
 		<alias>c</alias>
 	</command>
-	<command name="db" allow="5+" />
 	<command name="dimension" allow="0+">
 		<alias>d</alias>
 	</command>

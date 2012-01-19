@@ -39,7 +39,7 @@ public class Main {
       extendedVersion += "-" + releaseState;
     } else {
       String commitversion = getVersionString("VERSION");
-      if (!commitversion.equals("")) {
+      if (commitversion != null && !commitversion.equals("")) {
         extendedVersion += "-" + commitversion;
       }
     }

@@ -113,7 +113,7 @@ public class Server {
   private MinecraftWrapper minecraft;
   private RconServer rconServer;
   private TelnetServer telnetServer;
-  private AutoRun mapper;
+  private AutoRun autoMap;
   public AutoFreeSpaceChecker autoSpaceCheck;
   private AutoBackup autoBackup;
   private AutoSave autosave;
@@ -478,7 +478,7 @@ public class Server {
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
     playerTracker = new PlayerTracker(this);
-    mapper = new AutoRun(this, "Mapping", "mapper", "announceMapper", "mapperCmd", "mapperMins");
+    autoMap = new AutoRun(this, "Mapping", "autoMap", "announceMap", "autoMapCmd", "autoMapMins");
     if (data.freezeTime() >= 0) {
       time.freeze(data.freezeTime());
     }
@@ -518,7 +518,7 @@ public class Server {
     autoRestart.stop();
     requestTracker.stop();
     playerTracker.stop();
-    mapper.stop();
+    autoMap.stop();
     saveResources();
 
     playerList.waitUntilEmpty();
