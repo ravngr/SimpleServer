@@ -82,10 +82,12 @@
 					<class classes="private" methods="private" fields="private">
 						<patternset>
 							<include name="simpleserver.nbt.**" />
+							<include name="simpleserver.database.**" />
 							<include name="simpleserver.config.xml.**" />
 							<include name="simpleserver.command.**" />
 							<include name="org.apache.commons.logging.impl.**" />
 							<include name="org.apache.commons.jxpath.ri.**" />
+							<include name="com.mysql.**" />
 						</patternset>
 					</class>
 				</keep>
