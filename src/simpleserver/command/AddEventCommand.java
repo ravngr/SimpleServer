@@ -18,35 +18,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.config.xml;
+package simpleserver.command;
 
-import org.xml.sax.SAXException;
+import static simpleserver.lang.Translations.t;
+import simpleserver.Color;
+import simpleserver.Player;
+import simpleserver.Coordinate;
 
-class Argument extends XMLTag {
-  Permission allow;
-  String argument;
+import simpleserver.config.xml.Event;
 
-  Argument() {
-    super("argument");
+public class AddEventCommand extends AbstractCommand implements PlayerCommand {
+  public AddEventCommand() {
+    super("addevent NAME", "Add an empty placeholder event on current block below player");
   }
 
-  @Override
-  void setAttribute(String name, String value) throws SAXException {
-    if (name.equals("allow")) {
-      allow = new Permission(value);
-    } else if (name.equals("name")) {
-      content(value);
+  public void execute(Player player, String message) {
+    String[] args = extractArguments(message);
+    if (args.length == 0) {
+      player.addTMessage(Color.RED, "No name given!");
+      return;
     }
-  }
 
-  @Override
-  void content(String content) {
-    argument = (argument == null) ? content : argument + content;
-  }
+    if (player.getServer().config.events.contains(args[0])) {
+      player.addTMessage(Color.RED, "This event name is already taken!");
+      return;
+    }
 
-  @Override
-  void saveAttributes(AttributeList attributes) {
-    attributes.setValue("name", argument);
-    attributes.addAttribute("allow", allow);
+    Event e = new Event(args[0],
+              new Coordinate((int)player.x(), (int)player.y(), (int)player.z(), player.getDimension()));
+    player.getServer().config.events.add(e);
+    player.getServer().saveConfig();
+
+    player.addTMessage(Color.GRAY, "Event created!");
   }
 }

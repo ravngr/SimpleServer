@@ -20,33 +20,43 @@
  */
 package simpleserver.config.xml;
 
-import org.xml.sax.SAXException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeSet;
 
-class Argument extends XMLTag {
-  Permission allow;
-  String argument;
+public class EventStorage extends Storage implements Iterable<Event> {
+  private Map<String, Event> events = new HashMap<String, Event>();
 
-  Argument() {
-    super("argument");
+  public void add(Event event) {
+    events.put(event.name, event);
+  }
+
+  public boolean contains(String name) {
+    return events.containsKey(name);
+  }
+
+  public Event get(String name) {
+    return contains(name) ? events.get(name) : null;
   }
 
   @Override
-  void setAttribute(String name, String value) throws SAXException {
-    if (name.equals("allow")) {
-      allow = new Permission(value);
-    } else if (name.equals("name")) {
-      content(value);
+  public Iterator<Event> iterator() {
+    return new TreeSet<Event>(events.values()).iterator();
+  }
+
+  @Override
+  void add(XMLTag child) {
+    add((Event) child);
+  }
+
+  public Event getTopConfig(String name) {
+    if (events.containsKey(name)) {
+      return events.get(name);
     }
-  }
-
-  @Override
-  void content(String content) {
-    argument = (argument == null) ? content : argument + content;
-  }
-
-  @Override
-  void saveAttributes(AttributeList attributes) {
-    attributes.setValue("name", argument);
-    attributes.addAttribute("allow", allow);
+    for (Event event : events.values()) {
+      return event;
+    }
+    return null;
   }
 }

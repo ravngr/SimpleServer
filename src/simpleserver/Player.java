@@ -25,10 +25,12 @@ import static simpleserver.lang.Translations.t;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.xml.sax.SAXException;
@@ -45,6 +47,7 @@ import simpleserver.config.data.Stats.StatField;
 import simpleserver.config.xml.Area;
 import simpleserver.config.xml.CommandConfig;
 import simpleserver.config.xml.CommandConfig.Forwarding;
+import simpleserver.config.xml.Event;
 import simpleserver.config.xml.Group;
 import simpleserver.config.xml.Permission;
 import simpleserver.message.AbstractChat;
@@ -105,6 +108,10 @@ public class Player {
   private long lastTeleport;
   private short experienceLevel;
 
+  public ConcurrentHashMap<String, String> vars; // temporary player-scope
+                                                 // Script variables
+  private long lastEvent;
+
   private Area deepestArea = null;
 
   public Player(Socket inc, Server parent) {
@@ -113,6 +120,9 @@ public class Player {
     server = parent;
     chatType = new GlobalChat(this);
     extsocket = inc;
+
+    vars = new ConcurrentHashMap<String, String>();
+
     if (server.isRobot(getIPAddress())) {
       System.out.println("[SimpleServer] Robot Heartbeat: " + getIPAddress()
           + ".");
@@ -851,6 +861,46 @@ public class Player {
         addTMessage(Color.GRAY, "You will be teleported in %s seconds.", warmup / 1000);
       } else {
         teleportSelf(position);
+      }
+    }
+  }
+
+  public void checkLocationEvents() {
+    long currtime = System.currentTimeMillis();
+    if (currtime < lastEvent + 500) {
+      return;
+    }
+
+    Iterator<Event> it = server.eventhost.events.keySet().iterator();
+    while (it.hasNext()) {
+      Event ev = it.next();
+      if (ev.isbutton || ev.coordinate == null) {
+        continue;
+      }
+      if (position.coordinate().equals(ev.coordinate)) { // matching -> execute
+        server.eventhost.execute(ev, this, false);
+        lastEvent = currtime;
+      }
+    }
+  }
+
+  public void checkButtonEvents(Coordinate c) {
+    long currtime = System.currentTimeMillis();
+    if (currtime < lastEvent + 500) {
+      return;
+    }
+
+    Iterator<Event> it = server.eventhost.events.keySet().iterator();
+    while (it.hasNext()) {
+      Event ev = it.next();
+      if (!ev.isbutton || ev.coordinate == null) {
+        continue;
+      }
+      if ((new Coordinate(c.x(), c.y(), c.z(), position.dimension())).equals(ev.coordinate)) { // matching
+                                                                                               // ->
+                                                                                               // execute
+        server.eventhost.execute(ev, this, false);
+        lastEvent = currtime;
       }
     }
   }
